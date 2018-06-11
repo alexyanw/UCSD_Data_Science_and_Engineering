@@ -1,0 +1,10 @@
+1. FALSE - eg table self joining
+2. FASLE - T.A could have null value
+3. TRUE  - union of the join and difference, manually get rid of duplicate columns
+4. TRUE  - use 'GROUP BY'
+5. TRUE  - SELECT -MIN(-R.A) FROM R
+6. TRUE  - foriegn key on R.B constrains that every R.B can be matched and only matched once on S.B 
+7. TRUE  - use 'NOT IN'
+8. FALSE - may get different row number in result if unested
+9. FALSE - UNION get distinct values, UNION first will result in more rows than UNION later
+10.TRUE  - can't find a case to reject

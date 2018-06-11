@@ -1,0 +1,32 @@
+1. Find persons who served as both actor and director in the same movie (display person name and movie title).
+MATCH (p:Person)-[:ACTED_IN]->(m:Movie)<-[:DIRECTED]-(p:Person) RETURN p.name, m.title
+
+2. Find the name of directors who have never acted.
+MATCH (p:Person)-[:DIRECTED]->(:Movie) WHERE NOT (p:Person)-[:ACTED_IN]->(:Movie) RETURN DISTINCT p.name
+
+3. For each person who has acted in at least one movie, add a label "Actor" to the node representing this person.
+MATCH (p:Person)-[:ACTED_IN]->(:Movie) SET p:Actor
+
+4. For each actor, add a "roleCount" attribute containing the number of roles the actor has interpreted overall.
+MATCH (a:Person)-[act:ACTED_IN]->(:Movie)
+WITH a,count(act.roles) AS roleCount
+set a.roleCount = roleCount
+
+5. For each director, find the number of roles they have directed (display director name and role number).
+MATCH (d:Person)-[:DIRECTED]->(:Movie)<-[act:ACTED_IN]-(p)
+UNWIND act.roles AS act_role
+RETURN d.name as director, SIZE(COLLECT(DISTINCT act_role)) AS roleNumber
+ORDER BY roleNumber DESC
+
+6. Find the name of actors who have worked with every director born after 1966.
+MATCH (d:Person)-[:DIRECTED]->(:Movie)
+WHERE d.born > 1966
+WITH COLLECT(DISTINCT d) AS directors
+MATCH (:Movie)<-[:ACTED_IN]-(a:Person)
+WHERE ALL(d in directors WHERE (d:Person)-[:DIRECTED]->(:Movie)<-[:ACTED_IN]-(a))
+RETURN distinct a.name AS actor
+
+7. Rename each ACTED_IN relation to APPEARED_IN, preserve the "roles" attribute.
+MATCH (p:Person)-[a:ACTED_IN]->(m:Movie)
+CREATE (p)-[r:APPEARED_IN {roles:a.roles}]->(m)
+DELETE a

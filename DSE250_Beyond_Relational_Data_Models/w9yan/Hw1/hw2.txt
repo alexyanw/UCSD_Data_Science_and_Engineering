@@ -1,0 +1,41 @@
+1.
+<result>{
+    for $a in doc("j_caesar.xml")//ACT
+    for $s in $a/SCENE/SPEECH
+    where $s/LINE='Et tu, Brute! Then fall, Caesar.'
+    return 
+    <answer>
+    <who>{$s/SPEAKER/text()}</who>
+    <when>{$a/TITLE/text()}</when>
+    </answer>
+}</result>
+
+2.
+<speakers>{
+    for $p in doc("j_caesar.xml")//PERSONA
+    let $l := doc("j_caesar.xml")//SPEECH[SPEAKER=$p]/LINE
+    where count($l) > 0
+    return <character>{$p/text()}</character>
+}</speakers>
+
+3.
+<result>{
+    for $a in doc("j_caesar.xml")//ACT
+    for $p in doc("j_caesar.xml")//PERSONA
+    let $l := doc("j_caesar.xml")//SPEECH[SPEAKER=$p]/LINE
+    where count($l) > 0
+    return 
+    <answer>
+    <who>{$p/text()}</who>
+    <when>{$a/TITLE/text()}</when>
+    </answer>
+}</result>
+
+4.
+<result>{
+    for $p in doc("j_caesar.xml")//PERSONA
+    where every $a in doc("j_caesar.xml")//ACT
+    satisfies count($a//SPEECH[SPEAKER=$p]/LINE) > 0
+    return <character>{$p/text()}</character>
+}</result>
+
